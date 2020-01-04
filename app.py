@@ -31,10 +31,9 @@ for item in items:
         items.remove(item)
 
 # Store lowest price
-price = items[0].find('td', class_='item_price') \
+price_tag = items[0].find('td', class_='item_price') \
         .find('span', class_='converted_price').text
+price = re.sub('about|total', '', price_tag).strip()
+local_low = price[1:]
 
-
-# TODO: Remove everything besides regex pattern
-
-pattern = re.compile('.\d*\.?\d{0,2}')
+# TODO: If price has changed, then append new price to history
