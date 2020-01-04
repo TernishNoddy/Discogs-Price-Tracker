@@ -1,3 +1,4 @@
+import re
 import discogs_client
 from bs4 import BeautifulSoup
 import requests
@@ -20,16 +21,20 @@ url = 'https://www.discogs.com/sell/list?sort=price%2Casc' \
 source = requests.get(url).text
 soup = BeautifulSoup(source, 'lxml')
 
+# Get items listed for sale
+items = soup.find_all('tr', class_='shortcut_navigable')
 
-# TODO: Skip entry if it contains class_='unavailable'
+# Remove unavailable items
+for item in items:
+    match = re.search('shortcut_navigable unavailable', str(item))
+    if match:
+        items.remove(item)
 
-entries = soup.find_all('tr', class_='shortcut_navigable')
+# Store lowest price
+price = items[0].find('td', class_='item_price') \
+        .find('span', class_='converted_price').text
 
-for entry in entries:
-    if entry.attrs is not {'class': 'unavailable'}:
-        lowest = entry
-        break
-    else:
-        continue
 
-print(lowest)
+# TODO: Remove everything besides regex pattern
+
+pattern = re.compile('.\d*\.?\d{0,2}')
